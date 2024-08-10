@@ -1,0 +1,79 @@
+fragment TicketFields on Ticket {
+  comment
+  createdAt
+  description
+  id
+  status
+  title
+  updatedAt
+  lockedByUserId
+}
+
+query SearchTickets (
+  $searchTicketDto: SearchTicketDto!,
+  $pagination: Pagination!,
+){
+  searchTickets(pagination: $pagination, searchTicketDto: $searchTicketDto){
+    data {
+      ...TicketFields
+    }
+    totalCount
+    take
+    skip
+  }
+}
+
+query GetTicket (
+  $id: String!
+){
+  ticket(id: $id){
+      ...TicketFields
+  }
+}
+
+query  GetNextAvailableTicket {
+  getNextAvailableTicket {
+      ...TicketFields
+  }
+}
+
+mutation LockTicket (
+  $id: String!
+) {
+  lockTicket (id: $id){
+    ...TicketFields
+  }
+}
+
+mutation SkipTicket (
+  $id: String!
+) {
+  skipTicket (id: $id){
+    ...TicketFields
+  }
+}
+
+mutation handleTicket (
+  $id: String!
+) {
+  handleTicket (id: $id){
+    ...TicketFields
+  }
+}
+
+
+mutation UpdateTicket (
+  $updateTicketDto: UpdateTicketDto!
+) {
+  updateTicket(updateTicketDto: $updateTicketDto){
+    ...TicketFields
+  }
+}
+
+mutation AddTicketComment (
+  $addTicketCommentDto: AddTicketCommentDto!
+) {
+  addTicketComment(addTicketCommentDto: $addTicketCommentDto){
+    ...TicketFields
+  }
+}

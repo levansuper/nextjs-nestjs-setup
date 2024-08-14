@@ -16,6 +16,7 @@ user: testuser2@mailinator.com
 password: asdASD123!
 ```
 
+Env variables should not be pushed to the repo but since this is just a test and we don't really have any deployment pipeline this is not for simplicity 
 
 # High level architecture:
 
@@ -39,6 +40,7 @@ This is a simple application and will use a simple architecture with 3 main laye
 - The socket server could also be used to deliver real time notifications to the users when the entities are locked but for `test` app this could be skipped.
 - Having a separate locking service could be implemented to lock the tickets. `But` the idea is visible here and this service could be changed to become a `lock service` for anything by renaming the `ticket` table, dropping all the unnecessary fields and adding a reference to the foreign entity. Also instead of update there will be inserts in the new `lock service`
 - `Scaling` - The app is designed to be scalable horizontally.
+-  `Database locking` is not an option since there can be unlimited users using the app and this will slow down the performance.
 - #### Frontend (UI Layer): 
   - `NextJS` will be used for the frontend app. Currently this gives not real advantage over pure react app but since the future plans are not knows NextJS will make it possible to add `SSR` if needed in future.
   - `Auth0` will be used as an authentication service as it allows for an easy implementation and outsources the user management so we don't handle any passwords.  

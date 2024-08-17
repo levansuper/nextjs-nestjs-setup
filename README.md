@@ -18,9 +18,9 @@ password: asdASD123!
 
 Env variables should not be pushed to the repo but since this is just a test and we don't really have any deployment pipeline this is not for simplicity 
 
-# High level architecture:
+# Solution 1:
 
-The purpose of this document is to outline the architecture and design considerations for a web application that manages entities with a locking mechanism. The application ensures that entities are locked by the first user who requests it, making them editable by the user who locked them and read-only for other users. 
+This solution is simplistic an requires less effort to implement deploy and maintain.
 
 ### Entity Locking:
 - An entity can only be updated by the user who locks it. (changed this part from `the first user` to `user` since this is described in `Skipping` mechanism.)
@@ -51,4 +51,20 @@ This is a simple application and will use a simple architecture with 3 main laye
 - #### Database
   - `Postgres` - as the database for the app. `MongoDB` could also be used but relational databases have inherited advantage over the document DBs regarding the data integrity - that is very important for this app. Now it would not make any difference but in the future could effect the decision making. 
 
+
+
+### Solution 2
+
+This solution is more complex and utilizes Kafka for messaging.`Lock API` is a separate entity which handles all incoming lock requests. 
+
+Authentication will be done on `API Gateway` and `Socket API` Level. the diagram does not include the authentication mechanism since it is not a part of the problem we are solving.
+
+Message lock `REST` requests should include `expires` field that indicates where or not the lock should be rolled back if the target service was unresponsive.
+
+All `expirable` locks are set to `Mongo` with expiration date. The entries should be deleted on `$env.locker-api.w.lock.result`. Since there should not be many `expirable` entries in the mongoDB `Lock Expiration Observer` can be a single instance that reads the expired messages and notifies the `Lock API`
+
+After `Lock API` gets a successful message from `$env.locker-api.w.lock.result` it publishes a message `$env.socket-gateway.r.lock.verified` that is consumed by `Socket Gateway` that sends the message to the client apps.
+
+
+![Alt text](docs/microservice-architecture.png?raw=true "Title")
 
